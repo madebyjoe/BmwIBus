@@ -3,4 +3,8 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+
+    <!--Serial Example-->
+    <string name="app_title">USB Serial Example</string>
+    <string name="refreshing">Refreshing...</string>
 </resources>
