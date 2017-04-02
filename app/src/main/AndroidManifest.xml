@@ -3,6 +3,7 @@
     package="com.jbworks.bmwibus" >
 
     <uses-feature android:name="android.hardware.usb.host" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -10,7 +11,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".DeviceListActivity"
+            android:name=".MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,6 +31,23 @@
             android:name=".SerialConsoleActivity"
             android:label="@string/app_name" >
         </activity>
+
+        <service
+            android:name=".ibus.IBusMessageService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
+
+        <receiver
+            android:name=".ibus.BootupStartReciever"
+            android:enabled="true"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

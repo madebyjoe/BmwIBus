@@ -13,6 +13,7 @@
     <usb-device vendor-id="5824" product-id="1155" />
 
     <!-- 0x10C4 / 0xEA60: CP210x UART Bridge -->
+    <!--aka IBUS-->
     <usb-device vendor-id="4292" product-id="60000" />
     
     <!-- 0x067B / 0x2303: Prolific PL2303 -->
