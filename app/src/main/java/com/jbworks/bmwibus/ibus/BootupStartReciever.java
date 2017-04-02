@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 /**
  * Created by joe-work on 5/11/15.
@@ -14,7 +15,7 @@ public class BootupStartReciever extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         // TODO: This method is called when the BroadcastReceiver is receiving
-
+        Log.d("Service", "Service Started from Boot");
         // Start Service On Boot Start Up
         Intent service = new Intent(context, IBusMessageService.class);
         context.startService(service);

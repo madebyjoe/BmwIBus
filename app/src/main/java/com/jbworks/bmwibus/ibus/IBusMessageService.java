@@ -15,6 +15,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.jbworks.bmwibus.MediaController;
+import com.jbworks.bmwibus.UsbEventReceiverActivity;
 import com.jbworks.bmwibus.usbserial.driver.UsbSerialDriver;
 import com.jbworks.bmwibus.usbserial.driver.UsbSerialPort;
 import com.jbworks.bmwibus.usbserial.driver.UsbSerialProber;
@@ -86,6 +87,13 @@ public class IBusMessageService extends Service {
                         Log.i("usb", "permission denied for device " + device);
                     }
                 }
+            } else if (UsbEventReceiverActivity.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
+                startSerialSetup();
+                Log.i("usb", "BroadcastReceiver USB Connected");
+
+            } else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
+                stopIoManager();
+                Log.i("usb", "BroadcastReceiver USB Disconnected");
             }
         }
     };
@@ -119,27 +127,13 @@ public class IBusMessageService extends Service {
         Log.d(TAG, "Start Cmd Service");
         if(!mServiceRunning) {
             mServiceRunning = true;
-            Log.d(TAG, "Starting Serial Setup");
-            // Find all available drivers from attached devices.
-            UsbManager usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
-            List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager);
-            if (!availableDrivers.isEmpty()) {
+            startSerialSetup();
 
-                UsbSerialDriver firstDriver = availableDrivers.get(0);
-                sPort = firstDriver.getPorts().get(0);
-                UsbDevice usbDevice = firstDriver.getDevice();
-                if (usbManager.hasPermission(usbDevice)) {
-                    openDevice(usbDevice);
-                    onDeviceStateChange();
-                } else {
-                    Log.d(TAG, "Asking for permission");
-                    PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0);
-                    usbManager.requestPermission(usbDevice, pendingIntent);
-                }
-
-            }
-
-            IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(ACTION_USB_PERMISSION);
+            filter.addAction(UsbEventReceiverActivity.ACTION_USB_DEVICE_ATTACHED);
+            filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
+            filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
             registerReceiver(mUsbReceiver, filter);
 
             mediaController = new MediaController(this);
@@ -149,6 +143,27 @@ public class IBusMessageService extends Service {
         }
 
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    private void startSerialSetup(){
+        Log.d(TAG, "Starting Serial Setup");
+        // Find all available drivers from attached devices.
+        UsbManager usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
+        List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager);
+        if (!availableDrivers.isEmpty()) {
+
+            UsbSerialDriver firstDriver = availableDrivers.get(0);
+            sPort = firstDriver.getPorts().get(0);
+            UsbDevice usbDevice = firstDriver.getDevice();
+            if (usbManager.hasPermission(usbDevice)) {
+                openDevice(usbDevice);
+                onDeviceStateChange();
+            } else {
+//                Log.d(TAG, "Asking for permission");
+//                PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0);
+//                usbManager.requestPermission(usbDevice, pendingIntent);
+            }
+        }
     }
 
     private void openDevice(final UsbDevice usbDevice) {

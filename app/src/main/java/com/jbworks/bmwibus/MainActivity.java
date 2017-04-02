@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -137,9 +138,6 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Intent service = new Intent(this, IBusMessageService.class);
-        startService(service);
-
         Intent intent = new Intent(this, IBusMessageService.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 01, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         Notification.Builder builder = new Notification.Builder(getApplicationContext());
@@ -157,6 +155,14 @@ public class MainActivity extends Activity {
         NotificationManager notificationManger =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManger.notify(01, notification);
+    }
+
+    @Override
+    public void onResume() {
+        Log.d("Service", "Service Started from MainActivity");
+        Intent service = new Intent(this, IBusMessageService.class);
+        startService(service);
+        super.onResume();
     }
 
     @Override
