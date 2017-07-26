@@ -14,6 +14,7 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.jbworks.bmwibus.MediaController;
 import com.jbworks.bmwibus.UsbEventReceiverActivity;
 import com.jbworks.bmwibus.usbserial.driver.UsbSerialDriver;
@@ -27,6 +28,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by joe-work on 5/11/15.
@@ -120,6 +123,7 @@ public class IBusMessageService extends Service {
         Toast.makeText(getApplicationContext(), "Service Created", Toast.LENGTH_SHORT).show();
         mServiceRunning = false;
         super.onCreate();
+        Fabric.with(this, new Crashlytics());
     }
 
     @Override
